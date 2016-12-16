@@ -6,7 +6,7 @@
 
 class person():
     """class for person"""
-    def __init__(self):
+    def __init__(self, name, age, study):
         self.name = name
         self.age = age
         self.study = study
@@ -17,4 +17,3 @@ class person():
 class group(person):
     """a group of people"""
     def __init__(self):
-        person.__init__

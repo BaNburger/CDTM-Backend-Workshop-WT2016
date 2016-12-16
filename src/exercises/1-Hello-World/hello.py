@@ -1,7 +1,7 @@
 #initialisation
 import random as r
 import math as m
-
+import time as t
 
 #main
 def main():
@@ -24,7 +24,7 @@ class ExamlpeClass(object):
 	def __init__(self, arg):
 		super(ExamlpeClass, self).__init__()
 		self.arg = arg
-		
+
 
 #execute
 main()

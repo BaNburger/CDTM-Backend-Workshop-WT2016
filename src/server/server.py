@@ -105,5 +105,49 @@ def remove_task(list_id, task_id):
 
     return jsonify({'result': True})
 
+# UPDATE ROUTE
+@app.route('/api/lists/<string:list_id>/tasks/<string:task_id>', methods=['PUT'])
+def update_task(list_id, task_id):
+    # 1. Check wheter the specidic list exists
+    if (len([l for l in myLists if l.id == list_id]) < 1):
+        json_abort(404, 'List not found')
+
+    # 2. Check whether the specified task exists
+    tasks = [t for t in myTasks if t.id == task_id and t.list == list_id]
+    if (len(tasks) < 1):
+        json_abort(404, 'Task not found')
+
+    # 3. Check whether the required parameters have been sent
+    try:
+         data = request.get_json()
+    except:
+        json_abort(400, 'No JSON provided')
+
+    if data == None:
+        json_abort(400, 'Invalid Content-Type')
+
+    title = data.get('title', None)
+    if title == None:
+        json_abort(400, 'Invalid request parameters')
+
+    # 4. Finally update the task
+    myTask = [t for t in myTasks if t.id == task_id and t.list == list_id][0]
+    myTask.title = data.get('title', None)
+    try:
+        myTask.status = data.get('status', None)
+    except:
+        pass
+    try:
+        myTask.description = data.get('description', None)
+    except:
+        pass
+    try:
+        myTask.due = data.get('description', None)
+    except:
+        pass
+    myTask.revision += 1
+
+    return jsonify(myTask.__dict__)
+
 if __name__ == '__main__':
     app.run(host='localhost', port=20005, debug=True)

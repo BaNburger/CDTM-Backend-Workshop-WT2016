@@ -41,11 +41,28 @@ def dosomestuff(listId):
 
 @app.route("/api/lists/<int:listId>/tasks", methods=["POST"])
 def postsometask(listId):
-    newTask = task.Task(listId, request.get_json().__dict__["title"])
+#    newTask = task.Task(listId, request.get_json().__dict__["title"])
+#    Tasks.append(newTask)
+    ''' creates a new task for a list '''
+    if (len([l for l in Lists if l.listId == listId]) < 1):
+        json_abort(404, 'List not found')
+    try:
+         data = request.get_json()
+    except:
+        json_abort(400, 'No JSON provided')
+
+    if data == None:
+        json_abort(400, 'Invalid Content-Type')
+
+    title = data.get('title', None)
+    if title == None:
+        json_abort(400, 'Invalid request parameters')
+
+    id = max([int(t.taskId) for t in Tasks]+[-1]) + 1
+    newTask = Task(taskId=int(id), title=title, associatedList=listId)
+
     Tasks.append(newTask)
+    return jsonify(newTask.__dict__)
 
 if __name__ == '__main__':
-    addr = "localhost"         # the same as 127.0.0.1
-    port = 1337
-    debug = True               # activates the [1] debugger, [2] automatic reloader
-    app.run(host=addr, port=port, debug=debug)
+    app.run(host='localhost', port=1337, debug=True)

@@ -29,7 +29,7 @@ def homepage():
 
 @app.route("/api/version", methods=["GET"])
 def dostuff():
-    return jsonify({ "_version":1 })
+    return jsonify({ "_version":4.0 })
 
 @app.route("/api/lists", methods=["GET"])
 def domorestuff():
@@ -38,6 +38,11 @@ def domorestuff():
 @app.route("/api/lists/<int:listId>/tasks", methods=["GET"])
 def dosomestuff(listId):
     return jsonify({ "_tasks": [x.__dict__ for x in Tasks if x.list==listId]})
+
+@app.route("/api/lists/<int:listId>/tasks", methods=["POST"])
+def postsometask(listId):
+    newTask = task.Task(listId, request.get_json().__dict__["title"])
+    Tasks.append(newTask)
 
 if __name__ == '__main__':
     addr = "localhost"         # the same as 127.0.0.1

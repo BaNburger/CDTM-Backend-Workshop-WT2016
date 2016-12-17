@@ -7,7 +7,7 @@ defaultList = List(0, "defaultList")
 
 List1 = List(1, "Revolver")
 List2 = List(2, "Abbey Roads")
-Lists = [List1, List2]
+Lists = [defaultList, List1, List2]
 ListDict = {}
 #for LList in Lists:
 #    ListDict[LList.id] = LList
@@ -35,9 +35,9 @@ def dostuff():
 def domorestuff():
     return jsonify({ "_lists": [x.__dict__ for x in Lists] })
 
-@app.route("/api/tasks", methods=["GET"])
-def dosomestuff():
-    return jsonify({ "_tasks": [x.__dict__ for x in Tasks]})
+@app.route("/api/lists/<int:listId>/tasks", methods=["GET"])
+def dosomestuff(listId):
+    return jsonify({ "_tasks": [x.__dict__ for x in Tasks if x.list==listId]})
 
 if __name__ == '__main__':
     addr = "localhost"         # the same as 127.0.0.1

@@ -1,51 +1,71 @@
-from flask import Flask,render_template,send_file,jsonify
-from list import List
+#!/usr/bin/env python
+# coding: utf8
+
+from flask import Flask, send_file, request, jsonify
+import sys
+
+from utils import json_abort
+
 from task import Task
+from list import List
 
+# allow special characters (e.g. üäö ...)
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
-defaultList = List(0, "defaultList")
+VERSION = 4.0
 
-List1 = List(1, "Revolver")
-List2 = List(2, "Abbey Roads")
-Lists = [defaultList, List1, List2]
-ListDict = {}
-#for LList in Lists:
-#    ListDict[LList.id] = LList
+myLists = [
+    List('Inbox', id='0'),
+    List('Groceries', id='1')
+]
+myTasks = [
+    Task('Think about lunch', '1', id='0', status = Task.COMPLETED),
+    Task('Become a pro in backend development', '0', id='1', status= Task.NORMAL),
+    Task('CONQUER THE WORLD!', '0', id='2', status = Task.NORMAL)
+]
 
-Task1 = Task(1, "Penny Lane")
-Task2 = Task(2, "Yellow Submarine")
-Task3 = Task(3, "Octopuses Garden")
-Task4 = Task(4, "Lady Madonna")
-Tasks = [Task1, Task2, Task3, Task4]
+# Note: Setting static_url_path to '' has the following effect:
+#   - Whenever a file is requested and there is no matching route defined
+#     the flask server will look whether the file is in the 'static/' folder
+#   - As a consequence, everyone can remotely access files within 'static/'
+#   - We need this, so that the front-end works properly.
+app = Flask(__name__, static_url_path='')
 
-# create a new server app
-app = Flask(__name__, static_url_path="")
-
-# define all accessible routes
+# MARK: Static routes
 @app.route('/', methods=['GET'])
-def homepage():
-    return send_file("static/index.html")
-    #return render_template("index.html")
+def frontEnd():
+    return send_file('static/index.html')
 
-@app.route("/api/version", methods=["GET"])
-def dostuff():
-    return jsonify({ "_version":4.0 })
+# MARK: General routes
+@app.route('/api/version', methods=['GET'])
+def get_version():
+    return jsonify({'version': VERSION})
 
-@app.route("/api/lists", methods=["GET"])
-def domorestuff():
-    return jsonify({ "_lists": [x.__dict__ for x in Lists] })
+# MARK: List routes
+@app.route('/api/lists', methods=['GET'])
+def get_lists():
+    response = {}
+    response['lists'] = [l.__dict__ for l in myLists]
+    return jsonify(response)
 
-@app.route("/api/lists/<int:listId>/tasks", methods=["GET"])
-def dosomestuff(listId):
-    return jsonify({ "_tasks": [x.__dict__ for x in Tasks if x.list==listId]})
+# MARK: Task routes
+@app.route('/api/lists/<string:list_id>/tasks', methods=['GET'])
+def get_tasks(list_id):
+    response = {}
+    response['tasks'] = [t.__dict__ for t in myTasks if t.list==list_id]
+    return jsonify(response)
 
-@app.route("/api/lists/<int:listId>/tasks", methods=["POST"])
-def postsometask(listId):
-#    newTask = task.Task(listId, request.get_json().__dict__["title"])
-#    Tasks.append(newTask)
+# CREATE ROUTE
+@app.route('/api/lists/<string:list_id>/tasks', methods=['POST'])
+def create_task(list_id):
     ''' creates a new task for a list '''
-    if (len([l for l in Lists if l.listId == listId]) < 1):
+
+    # 1. Check whether the specified list exists
+    if (len([l for l in myLists if l.id == list_id]) < 1):
         json_abort(404, 'List not found')
+
+    # 2. Check whether the required parameters have been sent
     try:
          data = request.get_json()
     except:
@@ -58,11 +78,32 @@ def postsometask(listId):
     if title == None:
         json_abort(400, 'Invalid request parameters')
 
-    id = max([int(t.taskId) for t in Tasks]+[-1]) + 1
-    newTask = Task(taskId=int(id), title=title, associatedList=listId)
+    # 3. calculate the next id
+    id = max([int(t.id) for t in myTasks]+[-1]) + 1
+    newTask = Task(title, list_id, id=str(id), status = Task.NORMAL)
 
-    Tasks.append(newTask)
+    # 4. append task to array
+    myTasks.append(newTask)
+
+    # 5. return new task
     return jsonify(newTask.__dict__)
 
+# DESTROY ROUTE
+@app.route('/api/lists/<string:list_id>/tasks/<string:task_id>', methods=['DELETE'])
+def remove_task(list_id, task_id):
+    # 1. Check whether the specified list exists
+    if (len([l for l in myLists if l.id == list_id]) < 1):
+        json_abort(404, 'List not found')
+
+    # 2. Check whether the specified task exists
+    tasks = [t for t in myTasks if t.id == task_id and t.list == list_id]
+    if (len(tasks) < 1):
+        json_abort(404, 'Task not found')
+
+    # 3. finally remove the task
+    myTasks.remove(tasks[0])
+
+    return jsonify({'result': True})
+
 if __name__ == '__main__':
-    app.run(host='localhost', port=1337, debug=True)
+    app.run(host='localhost', port=20005, debug=True)

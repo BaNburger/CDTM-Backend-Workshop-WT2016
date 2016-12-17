@@ -14,9 +14,3 @@ class Task():
 
     def revision_down(self):
         self.revision -= 1
-
-
-Task1 = Task(1, "Penny Lane")
-Task2 = Task(2, "Yellow Submarine")
-Task3 = Task(3, "Octopuses Garden")
-Task4 = Task(4, "Lady Madonna")

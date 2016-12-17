@@ -1,14 +1,13 @@
-from flask import Flask
-
-
+from flask import Flask,render_template,send_file
 
 # create a new server app
 app = Flask(__name__, static_url_path="")
 
 # define all accessible routes
-@app.route('/')
+@app.route('/', methods=['GET'])
 def homepage():
-    return app.send_static_file("index.html")
+    return send_file("static/index.html")
+    #return render_template("index.html")
 
 if __name__ == '__main__':
     addr = "localhost"         # the same as 127.0.0.1

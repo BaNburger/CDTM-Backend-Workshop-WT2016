@@ -1,6 +1,6 @@
 import os
 
-from server import *
+from __init__ import *
 from server.database import *
 import config
 

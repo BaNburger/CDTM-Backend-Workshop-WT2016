@@ -9,11 +9,13 @@ from utils import json_abort
 from task import Task
 from list import List
 
+import database
+
 # allow special characters (e.g. üäö ...)
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-VERSION = 4.0
+VERSION = 7.0
 
 myLists = [
     List('Inbox', id='0'),
@@ -150,4 +152,5 @@ def update_task(list_id, task_id):
     return jsonify(myTask.__dict__)
 
 if __name__ == '__main__':
+    database.init_db()
     app.run(host='localhost', port=20005, debug=True)

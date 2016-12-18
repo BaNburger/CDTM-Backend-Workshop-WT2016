@@ -2,17 +2,15 @@ from utils import *
 
 from server import app
 from server.models import Task
+from server.utils import list_exists, has_json
 
-from utils import *
-
-from server import app
-from server.models import Task
-
-
+@list_exists
+@has_json
 def db_get_tasks_for_list(list_id):
+
     ''' Returns all tasks from the database for a given list'''
     query = '''
-
+        SELECT * FROM Tasks WHERE list = ?
     '''
     with app.app_context():
         cur = get_db().cursor()
@@ -24,10 +22,13 @@ def db_get_tasks_for_list(list_id):
                 tasks.append(task)
         return tasks
 
+@list_exists
+@has_json
 def db_get_task(list_id, task_id):
+
     ''' Queries the db for a task with the specified id'''
     query = '''
-
+        SELECT * FROM Tasks WHERE (id = ? AND list = ?) ORDER BY ASC
     '''
 
     with app.app_context():
@@ -36,11 +37,13 @@ def db_get_task(list_id, task_id):
         task = Task.fromDict(dict_from_row(cur.fetchone()))
         return task
 
-
+@list_exists
+@has_json
 def db_create_task(list_id, title):
+
     ''' Inserts a new task and returns it '''
     query = '''
-
+        INSERT INTO Tasks (title, list) VALUES (?, ?)
     '''
 
     with app.app_context():
@@ -51,10 +54,13 @@ def db_create_task(list_id, title):
 
     return db_get_task(list_id, cur.lastrowid)
 
+@list_exists
+@has_json
 def db_update_task(list_id, task):
+
     ''' Updates a task and returns it '''
     query = '''
-
+        UPDATE Tasks SET title = ?, list = ?, status = ?, description = ?, due = ?, revision = ? WHERE id = ?
     '''
 
     with app.app_context():
@@ -65,10 +71,13 @@ def db_update_task(list_id, task):
 
     return db_get_task(list_id, task.id)
 
+@list_exists
+@has_json
 def db_delete_task(id):
+
     ''' Deletes the task with the specified id '''
     query = '''
-
+        DELETE FROM Tasks WHERE id = ?
     '''
 
     with app.app_context():

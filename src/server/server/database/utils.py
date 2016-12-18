@@ -1,7 +1,7 @@
 from flask import g
 import sqlite3
 
-from server import app
+import __init__
 
 # make sure to use this gets only called within app.app_context()
 def get_db():

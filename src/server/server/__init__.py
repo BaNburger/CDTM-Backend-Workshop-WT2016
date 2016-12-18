@@ -6,8 +6,8 @@ import sys
 
 from utils import json_abort
 
-from task import Task
-from list import List
+from database.task import Task
+from database.list import List
 
 # allow special characters (e.g. üäö ...)
 reload(sys)

@@ -6,10 +6,7 @@ import sys
 
 from utils import json_abort
 
-from task import Task
-from list import List
-
-import database
+from models import *
 
 # allow special characters (e.g. üäö ...)
 reload(sys)
@@ -150,7 +147,3 @@ def update_task(list_id, task_id):
     myTask.revision += 1
 
     return jsonify(myTask.__dict__)
-
-if __name__ == '__main__':
-    database.init_db()
-    app.run(host='localhost', port=20005, debug=True)

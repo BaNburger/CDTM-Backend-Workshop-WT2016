@@ -2,7 +2,7 @@ import sqlite3
 
 DB = None
 
-# make sure we connect only once to th database
+# make sure we connect only once to the database
 def get_db():
     global DB
     db = DB

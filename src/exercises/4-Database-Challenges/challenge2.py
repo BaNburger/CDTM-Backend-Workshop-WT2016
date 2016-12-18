@@ -26,7 +26,7 @@ def dict_from_row(row):
 # TODO: Insert a new user
 def db_add_user(name):
     # Save your SQL query as a string into the variable query
-    query = ''
+    query = 'INSERT INTO Users (name) VALUES (?)'
 
     db = get_db()
     cur = db.cursor()
